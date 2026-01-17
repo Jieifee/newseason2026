@@ -1,241 +1,475 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mohamed Sanogo — Creative Profile</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohamed Sanogo | Scouting Report #11</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --soccer-blue: #3b82f6;
+            --soccer-dark: #050505;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--soccer-dark);
+            color: #e5e7eb;
+            overflow-x: hidden;
+            width: 100%;
+        }
+        .font-fifa { font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.02em; }
+        
+        .card-scouting { 
+            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
+        }
+        
+        .stat-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.05); overflow: hidden; }
+        .stat-fill { height: 100%; background: var(--soccer-blue); box-shadow: 0 0 15px var(--soccer-blue); width: 0; transition: width 1.5s cubic-bezier(0.19, 1, 0.22, 1); }
+        
+        .modal-overlay { 
+            background: rgba(0, 0, 0, 0.96); 
+            backdrop-filter: blur(20px); 
+            z-index: 100; 
+            display: none; 
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            position: fixed;
+            inset: 0;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        
+        .lang-en [data-lang="fr"] { display: none; }
+        .lang-fr [data-lang="en"] { display: none; }
 
-  <!-- ===================== -->
-  <!-- ======= STYLE ======= -->
-  <!-- ===================== -->
-  <style>
-    :root {
-      --bg: #0a0a0a;
-      --primary: #2563eb;
-      --text: #ffffff;
-      --muted: #9ca3af;
-      --card: #111111;
-      --radius: 20px;
-      --transition: 0.6s cubic-bezier(.4,0,.2,1);
-    }
+        .jersey-anim { filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.15)); transition: all 0.6s ease; }
+        .jersey-anim:hover { filter: drop-shadow(0 0 60px rgba(59, 130, 246, 0.4)); transform: translateY(-5px) scale(1.02); }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        
+        .btn-hover-effect { transition: all 0.3s ease; }
+        .btn-hover-effect:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4); }
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0f172a, var(--bg));
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    section {
-      padding: 100px 6%;
-    }
-
-    h1, h2, h3 {
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    h1 {
-      font-size: clamp(2.5rem, 5vw, 4.5rem);
-    }
-
-    h2 {
-      font-size: clamp(1.8rem, 3vw, 2.8rem);
-      margin-bottom: 40px;
-    }
-
-    p {
-      color: var(--muted);
-      max-width: 700px;
-    }
-
-    /* ===================== */
-    /* ====== ANIMATION ==== */
-    /* ===================== */
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: var(--transition);
-    }
-
-    .reveal.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ===================== */
-    /* ======= HERO ======= */
-    /* ===================== */
-
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-    }
-
-    .hero-content {
-      max-width: 900px;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 10px 18px;
-      border-radius: 999px;
-      background: rgba(37,99,235,0.15);
-      color: var(--primary);
-      font-weight: 700;
-      margin-bottom: 25px;
-    }
-
-    /* ===================== */
-    /* ======= STATS ======= */
-    /* ===================== */
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 25px;
-      margin-top: 60px;
-    }
-
-    .stat-card {
-      background: linear-gradient(145deg, #0b0b0b, #151515);
-      border-radius: var(--radius);
-      padding: 30px;
-      box-shadow: 0 0 30px rgba(37,99,235,0.35);
-      transition: transform .4s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-8px);
-    }
-
-    .stat-value {
-      font-size: 2.2rem;
-      font-weight: 900;
-      color: var(--primary);
-    }
-
-    .stat-label {
-      font-size: .9rem;
-      color: var(--muted);
-      margin-top: 8px;
-    }
-
-    /* ===================== */
-    /* ===== EXPERIENCE ==== */
-    /* ===================== */
-
-    .timeline {
-      display: grid;
-      gap: 25px;
-      max-width: 900px;
-    }
-
-    .timeline-item {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 30px;
-      border-left: 4px solid var(--primary);
-    }
-
-    /* ===================== */
-    /* ===== FOOTER ======= */
-    /* ===================== */
-
-    footer {
-      padding: 60px 6%;
-      text-align: center;
-      color: var(--muted);
-      font-size: .9rem;
-    }
-  </style>
+        .skill-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+    </style>
 </head>
+<body class="antialiased lang-fr">
 
-<body>
+    <!-- HUD NAVIGATION -->
+    <header class="fixed top-0 w-full z-[60] border-b border-white/5 bg-black/50 backdrop-blur-2xl px-4 md:px-8 py-3 md:py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 md:gap-4">
+                <div class="w-8 h-8 md:w-10 md:h-10 bg-blue-600 rounded-full flex items-center justify-center font-black italic text-white shadow-[0_0_20px_rgba(59,130,246,0.3)] text-sm md:text-base select-none">11</div>
+                <div>
+                    <h1 class="font-fifa text-[10px] md:text-sm tracking-widest leading-none text-white uppercase">M. SANOGO</h1>
+                    <p class="text-[7px] md:text-[9px] text-white/30 font-bold uppercase tracking-[0.1em] md:tracking-[0.3em] mt-1 italic">
+                        <span data-lang="fr">PROSPECT • MASTER 2 COMMUNICATION</span>
+                        <span data-lang="en">PROSPECT • MASTER 2 COMMUNICATION</span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 md:gap-6">
+                <button onclick="openModal('scoutingModal')" class="hidden sm:block text-[9px] md:text-[10px] font-fifa text-white/40 hover:text-white transition-colors tracking-[0.2em] border-b border-transparent hover:border-blue-500 pb-1 uppercase">
+                    <span data-lang="fr">Scouting Report</span><span data-lang="en">Scouting Report</span>
+                </button>
+                <button onclick="toggleLang()" id="langBtn" class="w-8 h-8 md:w-10 md:h-10 border border-white/10 rounded-full flex items-center justify-center text-[9px] md:text-[10px] font-black hover:bg-white/5 transition-all text-white/60">
+                    EN
+                </button>
+            </div>
+        </div>
+    </header>
 
-  <!-- ===================== -->
-  <!-- ======= HERO ======= -->
-  <!-- ===================== -->
-  <section class="hero">
-    <div class="hero-content reveal">
-      <span class="badge">Creative Profile</span>
-      <h1>Mohamed Sanogo</h1>
-      <p>
-        Étudiant en communication, créatif digital et stratège de contenu.
-        Passionné par le branding, la culture urbaine et les expériences visuelles
-        à fort impact.
-      </p>
+    <main class="max-w-7xl mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-24 space-y-32 md:space-y-64">
+        
+        <!-- SECTION HERO -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20 items-center min-h-[60vh] md:min-h-[70vh]">
+            <div class="lg:col-span-7 space-y-8 md:space-y-12 text-center lg:text-left order-2 lg:order-1">
+                <div class="space-y-4 md:space-y-6">
+                    <div class="inline-flex items-center gap-2 text-blue-500 font-fifa text-[9px] md:text-[11px] tracking-[0.3em] md:tracking-[0.5em]">
+                        <div class="w-6 md:w-8 h-[1px] bg-blue-500/40"></div>
+                        <span data-lang="fr">UCAO-UUA ACADEMY</span>
+                        <span data-lang="en">UCAO-UUA ACADEMY</span>
+                    </div>
+                    <h2 class="text-5xl sm:text-6xl md:text-8xl lg:text-[8.5rem] font-fifa leading-[0.85] text-white tracking-tighter">
+                        <span data-lang="fr">ESPOIR</span><span data-lang="en">RISING</span> <br>
+                        <span class="text-blue-600 drop-shadow-[0_15px_40px_rgba(59,130,246,0.2)]">
+                            <span data-lang="fr">MONTANT</span><span data-lang="en">PROSPECT</span>
+                        </span>
+                    </h2>
+                    <p class="text-sm md:text-xl text-white/30 max-w-xl mx-auto lg:mx-0 italic font-light leading-relaxed lg:border-l lg:border-white/10 lg:pl-10">
+                        <span data-lang="fr">"Futur stratège en communication d'organisation. Maîtrise des écosystèmes digitaux et de l'architecture visuelle."</span>
+                        <span data-lang="en">"Future organizational communication strategist. Mastery of digital ecosystems and visual architecture."</span>
+                    </p>
+                </div>
 
-      <div class="stats">
-        <div class="stat-card reveal">
-          <div class="stat-value">22</div>
-          <div class="stat-label">Âge</div>
+                <div class="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 md:gap-5">
+                    <button onclick="openModal('contractModal')" class="btn-hover-effect bg-blue-600 text-white px-8 md:px-10 py-4 md:py-5 rounded-full font-fifa text-[9px] md:text-[10px] tracking-widest shadow-xl shadow-blue-600/20 w-full sm:w-auto">
+                        <span data-lang="fr">SIGNER UN CONTRAT</span><span data-lang="en">OFFER CONTRACT</span>
+                    </button>
+                    <button onclick="openModal('scoutingModal')" class="btn-hover-effect bg-white/5 border border-white/10 text-white px-8 md:px-10 py-4 md:py-5 rounded-full font-fifa text-[9px] md:text-[10px] tracking-widest uppercase w-full sm:w-auto">
+                        <span data-lang="fr">Dossier Technique</span><span data-lang="en">Technical File</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARTE DU JOUEUR -->
+            <div class="lg:col-span-5 flex justify-center order-1 lg:order-2">
+                <div class="relative w-full max-w-[300px] md:max-w-[380px] aspect-[3.2/4] card-scouting p-8 md:p-12 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl overflow-hidden group transition-transform duration-500 hover:scale-[1.02]">
+                    <div class="flex justify-between items-start mb-8 md:mb-12 relative z-10">
+                        <div class="text-center leading-none">
+                            <span class="text-6xl md:text-9xl font-fifa text-white block">79</span>
+                            <span class="text-blue-500 font-bold text-[8px] md:text-[10px] tracking-[0.3em] uppercase">OVR</span>
+                        </div>
+                        <div class="w-12 h-12 md:w-16 md:h-16 bg-white text-black rounded-full flex items-center justify-center font-black italic text-xl md:text-3xl shadow-xl border-2 md:border-4 border-white/10">11</div>
+                    </div>
+                    
+                    <div class="mb-8 md:mb-10 relative z-10">
+                        <h3 class="text-4xl md:text-6xl font-fifa text-white tracking-tighter italic uppercase leading-tight">SANOGO</h3>
+                        <p class="text-[8px] md:text-[10px] font-black text-white/20 tracking-[0.4em] mt-2 md:mt-3 uppercase italic leading-none">22 Ans • Master 2</p>
+                    </div>
+
+                    <div class="space-y-4 md:space-y-6 relative z-10">
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-[8px] md:text-[10px] font-fifa tracking-widest text-white/40 uppercase italic">
+                                <span><span data-lang="fr">Stratégie</span><span data-lang="en">Strategy</span></span>
+                                <span class="text-white">81</span>
+                            </div>
+                            <div class="stat-bar"><div class="stat-fill" data-width="81%" style="width: 81%"></div></div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-[8px] md:text-[10px] font-fifa tracking-widest text-white/40 uppercase italic">
+                                <span>Design</span>
+                                <span class="text-white">85</span>
+                            </div>
+                            <div class="stat-bar"><div class="stat-fill" data-width="85%" style="width: 85%"></div></div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-[8px] md:text-[10px] font-fifa tracking-widest text-white/40 uppercase italic">
+                                <span>Social</span>
+                                <span class="text-white">88</span>
+                            </div>
+                            <div class="stat-bar"><div class="stat-fill" data-width="88%" style="width: 88%"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- JERSEY SECTION -->
+        <section class="py-10 text-center flex flex-col items-center px-4">
+            <div class="w-56 h-64 sm:w-72 sm:h-80 md:w-[400px] md:h-[400px] jersey-anim cursor-default relative">
+                <div class="absolute inset-0 bg-blue-600/10 blur-[80px] md:blur-[130px] rounded-full scale-125"></div>
+                <svg viewBox="0 0 100 120" class="w-full h-full relative z-10">
+                    <path d="M20,30 L30,20 L70,20 L80,30 L80,110 L20,110 Z" fill="#1d4ed8" />
+                    <text x="50" y="45" text-anchor="middle" fill="white" font-size="6" font-weight="900" opacity="0.8" font-family="sans-serif">SANOGO</text>
+                    <text x="50" y="88" text-anchor="middle" fill="white" font-size="34" font-weight="900" font-family="serif">11</text>
+                    <path d="M30,20 L40,25 C45,22 55,22 60,25 L70,20" fill="none" stroke="white" stroke-width="0.5" opacity="0.1" />
+                </svg>
+            </div>
+            <div class="mt-8 space-y-3">
+                <span class="text-[9px] md:text-[12px] font-fifa text-blue-500 tracking-[0.6em] md:tracking-[1em] animate-pulse uppercase leading-none">Game Changer</span>
+                <h4 class="text-lg md:text-3xl font-fifa text-white/10 italic uppercase tracking-widest leading-tight">SQUAD NUMBER 11</h4>
+            </div>
+        </section>
+
+        <!-- HISTORIQUE DES CLUBS -->
+        <section class="space-y-12 md:space-y-16">
+            <div class="text-center lg:text-left border-b border-white/5 pb-8">
+                <h3 class="text-3xl md:text-5xl font-fifa text-white uppercase italic tracking-tighter leading-tight"><span data-lang="fr">Historique Clubs</span><span data-lang="en">Club History</span></h3>
+                <p class="text-blue-500 text-[8px] md:text-xs font-bold uppercase tracking-[0.3em] md:tracking-[0.5em] mt-2 italic leading-none">Professional Career Transfers</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                <div class="card-scouting p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] space-y-6 group hover:border-blue-500/40 transition-all duration-500">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[8px] md:text-[10px] font-fifa bg-blue-600 px-4 py-1.5 rounded-full text-white shadow-lg italic leading-none uppercase">2025</span>
+                        <span class="text-2xl md:text-3xl font-fifa text-white/5 group-hover:text-blue-500/20 transition-colors select-none">#01</span>
+                    </div>
+                    <div>
+                        <h4 class="text-xl md:text-3xl font-fifa text-white italic uppercase tracking-tight group-hover:text-blue-500 transition-colors leading-tight">PIXLSTUDIO</h4>
+                        <p class="text-blue-500 font-bold text-[8px] md:text-[10px] tracking-widest uppercase mt-1 md:mt-2 italic leading-none">Community Manager (Stage)</p>
+                    </div>
+                    <p class="text-white/30 italic text-xs md:text-sm leading-relaxed border-l border-white/10 pl-6">
+                        <span data-lang="fr">Gestion de 8 marques premium, pilotage de campagnes Meta Business & reporting Analytics.</span>
+                        <span data-lang="en">Managed 8 premium brands, Meta Business campaign lead & Analytics reporting.</span>
+                    </p>
+                </div>
+                <div class="card-scouting p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] space-y-6 group hover:border-blue-500/40 transition-all duration-500">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[8px] md:text-[10px] font-fifa bg-white/5 border border-white/10 px-4 py-1.5 rounded-full text-white/40 italic leading-none uppercase">2024 - 2025</span>
+                        <span class="text-2xl md:text-3xl font-fifa text-white/5 group-hover:text-blue-500/20 transition-colors select-none">#02</span>
+                    </div>
+                    <div>
+                        <h4 class="text-xl md:text-3xl font-fifa text-white italic uppercase tracking-tight group-hover:text-blue-500 transition-colors leading-tight">SANCOFA AGENCY</h4>
+                        <p class="text-blue-500 font-bold text-[8px] md:text-[10px] tracking-widest uppercase mt-1 md:mt-2 italic leading-none">Web & Graphic Designer</p>
+                    </div>
+                    <p class="text-white/30 italic text-xs md:text-sm leading-relaxed border-l border-white/10 pl-6">
+                        <span data-lang="fr">Création d'identités visuelles, mockups UI haute-fidélité et développement de sites vitrines.</span>
+                        <span data-lang="en">Visual identities, high-fidelity UI mockups and showcase website development.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PALMARÈS INDIVIDUEL -->
+        <section class="space-y-12 md:space-y-16">
+            <div class="text-center lg:text-left border-b border-white/5 pb-8">
+                <h3 class="text-3xl md:text-5xl font-fifa text-white uppercase italic tracking-tighter leading-tight"><span data-lang="fr">Palmarès Solo</span><span data-lang="en">Personal Honors</span></h3>
+                <p class="text-blue-500 text-[8px] md:text-xs font-bold uppercase tracking-[0.3em] md:tracking-[0.5em] mt-2 italic leading-none">Achievements & Certifications</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                <div class="card-scouting p-8 md:p-12 rounded-[2rem] md:rounded-[3.5rem] flex flex-col items-center text-center space-y-5 md:space-y-6 group transition-all">
+                    <div class="w-16 h-16 md:w-20 md:h-20 bg-blue-600/10 rounded-[1.2rem] md:rounded-[2rem] flex items-center justify-center text-2xl md:text-4xl text-orange-500 group-hover:scale-110 transition-transform shadow-inner">🔥</div>
+                    <div>
+                        <h4 class="text-lg md:text-2xl font-fifa text-white uppercase italic tracking-tight leading-tight">Creative Ads Challenge</h4>
+                        <p class="text-blue-500 font-bold text-[8px] md:text-[10px] tracking-widest mt-2 uppercase italic leading-none">Season 2024</p>
+                    </div>
+                    <p class="text-white/30 italic text-xs md:text-sm max-w-xs leading-relaxed">
+                        <span data-lang="fr">30,000 impressions organiques générées en solo sur une campagne créative stratégique.</span>
+                        <span data-lang="en">30,000 organic impressions generated solo on a strategic creative campaign.</span>
+                    </p>
+                </div>
+                <div class="card-scouting p-8 md:p-12 rounded-[2rem] md:rounded-[3.5rem] flex flex-col items-center text-center space-y-5 md:space-y-6 group transition-all">
+                    <div class="w-16 h-16 md:w-20 md:h-20 bg-blue-600/10 rounded-[1.2rem] md:rounded-[2rem] flex items-center justify-center text-2xl md:text-4xl text-blue-500 group-hover:scale-110 transition-transform shadow-inner">🎤</div>
+                    <div>
+                        <h4 class="text-lg md:text-2xl font-fifa text-white uppercase italic tracking-tight leading-tight">Master Speaking</h4>
+                        <p class="text-blue-500 font-bold text-[8px] md:text-[10px] tracking-widest mt-2 uppercase italic leading-none">Certificat Certifié</p>
+                    </div>
+                    <p class="text-white/30 italic text-xs md:text-sm max-w-xs leading-relaxed">
+                        <span data-lang="fr">Expertise validée en art oratoire, impact scénique et prise de parole professionnelle.</span>
+                        <span data-lang="en">Validated expertise in public speaking, stage impact and professional speech.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MERCATO CALL (CONTACT) -->
+        <section class="card-scouting rounded-[2.5rem] md:rounded-[4.5rem] p-8 md:p-24 lg:p-32 text-center relative overflow-hidden">
+            <h3 class="text-4xl md:text-8xl font-fifa leading-none text-white uppercase tracking-tighter italic leading-tight"><span data-lang="fr">MERCATO</span><span data-lang="en">MERCATO</span></h3>
+            <p class="text-blue-500 text-[8px] md:text-sm font-bold uppercase tracking-[0.4em] md:tracking-[0.8em] mt-4 mb-8 md:mb-12 italic leading-none">Available for Negotiation</p>
+            <p class="text-lg md:text-2xl text-white/20 max-w-2xl mx-auto italic font-light leading-relaxed mb-10 md:mb-16 px-2">
+                <span data-lang="fr">"Prêt à intégrer un nouvel effectif pour transformer chaque challenge en victoire stratégique."</span>
+                <span data-lang="en">"Ready to join a new roster to turn every challenge into a strategic victory."</span>
+            </p>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8">
+                <button onclick="openModal('contractModal')" class="btn-hover-effect w-full md:w-auto bg-white text-black px-10 md:px-12 py-5 md:py-7 rounded-full font-fifa text-[9px] md:text-[11px] tracking-widest shadow-2xl uppercase">
+                    <span data-lang="fr">Démarrer les Négociations</span><span data-lang="en">Start Negotiations</span>
+                </button>
+                <div class="text-white/30 font-fifa text-[8px] md:text-[10px] tracking-widest flex items-center gap-3 border border-white/5 px-6 md:px-8 py-5 md:py-7 rounded-full leading-none">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_green]"></span> sanogochristian74@gmail.com
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-black py-16 md:py-24 px-6 text-center border-t border-white/5 opacity-30">
+        <p class="font-fifa text-[9px] md:text-xs tracking-[0.4em] md:tracking-[0.6em] mb-4 text-white uppercase leading-none italic">M. SANOGO • Squad #11</p>
+        <p class="text-[7px] md:text-[9px] font-bold uppercase tracking-[0.3em] leading-none">© 2026 • FUTURE GAME CHANGER • ABIDJAN, CI</p>
+    </footer>
+
+    <!-- MODALE: SCOUTING REPORT (CV) -->
+    <div id="scoutingModal" class="modal-overlay items-center justify-center p-2 md:p-4">
+        <div class="bg-[#0d0d0d] border border-white/10 w-full max-w-5xl max-h-[96vh] rounded-[2rem] md:rounded-[3.5rem] flex flex-col shadow-2xl relative transition-all duration-500 scale-95 origin-center" id="scoutingContent">
+            <div class="p-6 md:p-10 border-b border-white/5 flex justify-between items-center shrink-0">
+                <h3 class="text-lg md:text-3xl font-fifa text-blue-500 tracking-tighter uppercase italic leading-none">
+                    <span data-lang="fr">Dossier Technique</span><span data-lang="en">Technical File</span>
+                </h3>
+                <button onclick="closeModal('scoutingModal')" class="p-2 md:p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors text-white/50 hover:text-white uppercase text-[8px] md:text-[10px] font-bold tracking-widest leading-none">Close [X]</button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 md:p-14 space-y-16 md:space-y-24 custom-scrollbar">
+                <!-- HEADER CV -->
+                <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+                    <div class="w-20 h-20 md:w-32 md:h-32 bg-blue-600 rounded-[1.5rem] md:rounded-3xl flex items-center justify-center font-black italic text-3xl md:text-6xl shadow-2xl select-none">11</div>
+                    <div class="text-center md:text-left space-y-3">
+                        <h4 class="text-4xl md:text-7xl font-fifa text-white leading-none uppercase tracking-tighter italic leading-tight">Mohamed Sanogo</h4>
+                        <div class="flex flex-wrap justify-center md:justify-start gap-2 md:gap-3">
+                            <span class="px-3 md:px-4 py-1.5 bg-blue-600/10 border border-blue-500/20 rounded-lg text-[8px] md:text-[10px] font-fifa tracking-widest text-blue-500 italic uppercase">MASTER 2 COMMUNICATION</span>
+                            <span class="px-3 md:px-4 py-1.5 bg-white/5 border border-white/10 rounded-lg text-[8px] md:text-[10px] font-fifa tracking-widest text-white/40 italic uppercase">22 Ans • Abidjan</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ARSENAL TECHNIQUE -->
+                <div class="space-y-8 md:space-y-12">
+                    <h5 class="text-blue-500 font-fifa text-[11px] md:text-[13px] tracking-widest flex items-center gap-4 md:gap-5 italic uppercase leading-none">
+                        <div class="w-6 md:w-10 h-[1px] bg-blue-500/40"></div> <span data-lang="fr">Arsenal Technique</span><span data-lang="en">Technical Arsenal</span>
+                    </h5>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                        <div class="space-y-4">
+                            <p class="text-[8px] md:text-[10px] font-fifa text-white/30 tracking-widest uppercase italic border-b border-white/5 pb-2 leading-none">Tactique & Data</p>
+                            <div class="flex flex-wrap gap-2 md:gap-3">
+                                <div class="skill-badge px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-fifa tracking-widest text-white/60 uppercase italic leading-none">Meta Business</div>
+                                <div class="skill-badge px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-fifa tracking-widest text-white/60 uppercase italic leading-none">Google Analytics</div>
+                                <div class="skill-badge px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-fifa tracking-widest text-white/60 uppercase italic leading-none">Ads Management</div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-[8px] md:text-[10px] font-fifa text-white/30 tracking-widest uppercase italic border-b border-white/5 pb-2 leading-none">Créatif & Design</p>
+                            <div class="flex flex-wrap gap-2 md:gap-3">
+                                <div class="skill-badge px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-fifa tracking-widest text-white/60 uppercase italic leading-none">Graphic Design</div>
+                                <div class="skill-badge px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-fifa tracking-widest text-white/60 uppercase italic leading-none">Figma / Web</div>
+                                <div class="skill-badge px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-fifa tracking-widest text-white/60 uppercase italic leading-none">Video Editing</div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-[8px] md:text-[10px] font-fifa text-white/30 tracking-widest uppercase italic border-b border-white/5 pb-2 leading-none">Digital Eng.</p>
+                            <div class="flex flex-wrap gap-2 md:gap-3">
+                                <div class="skill-badge px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-fifa tracking-widest text-white/60 uppercase italic leading-none">AI / Prompts</div>
+                                <div class="skill-badge px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-fifa tracking-widest text-white/60 uppercase italic leading-none">HTML / CSS / JS</div>
+                                <div class="skill-badge px-3 md:px-5 py-2 md:py-3 rounded-xl md:rounded-2xl text-[8px] md:text-[10px] font-fifa tracking-widest text-white/60 uppercase italic leading-none">SEO Copywriting</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MATCH HISTORY COMPLET -->
+                <div class="space-y-8 md:space-y-12 pb-12">
+                    <h5 class="text-blue-500 font-fifa text-[11px] md:text-[13px] tracking-widest flex items-center gap-4 md:gap-5 italic uppercase leading-none">
+                        <div class="w-6 md:w-10 h-[1px] bg-blue-500/40"></div> <span data-lang="fr">Parcours Complet</span><span data-lang="en">Full Career</span>
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                        <div class="card-scouting p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] space-y-4 hover:bg-white/[0.05] transition-all">
+                            <span class="text-[8px] md:text-[9px] font-fifa bg-blue-600 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-white uppercase italic tracking-widest leading-none">July - Oct 2025</span>
+                            <h6 class="text-xl md:text-3xl font-fifa text-white italic uppercase tracking-tighter leading-none">PIXLSTUDIO</h6>
+                            <p class="text-blue-500 text-[8px] md:text-[10px] font-fifa tracking-widest uppercase italic leading-none">Community Manager</p>
+                            <p class="text-[10px] md:text-xs text-white/30 italic leading-relaxed border-l border-white/10 pl-4">8 Marques Premium. Pilotage Meta Business & Analytics. Recommandations stratégiques.</p>
+                        </div>
+                        <div class="card-scouting p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] space-y-4 hover:bg-white/[0.05] transition-all">
+                            <span class="text-[8px] md:text-[9px] font-fifa bg-white/10 border border-white/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-white/40 uppercase italic tracking-widest leading-none">Oct 24 - July 25</span>
+                            <h6 class="text-xl md:text-3xl font-fifa text-white italic uppercase tracking-tighter leading-none">SANCOFA AGENCY</h6>
+                            <p class="text-blue-500 text-[8px] md:text-[10px] font-fifa tracking-widest uppercase italic leading-none">Web & Graphic Designer</p>
+                            <p class="text-[10px] md:text-xs text-white/30 italic leading-relaxed border-l border-white/10 pl-4">Logos, maquettes UI & déploiement sites vitrines. Contenus réseaux sociaux.</p>
+                        </div>
+                        <div class="card-scouting p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] space-y-4 hover:bg-white/[0.05] transition-all">
+                            <span class="text-[8px] md:text-[9px] font-fifa bg-white/10 border border-white/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-white/40 uppercase italic tracking-widest leading-none">July - Aug 2025</span>
+                            <h6 class="text-xl md:text-3xl font-fifa text-white italic uppercase tracking-tighter leading-none uppercase">AMG Records</h6>
+                            <p class="text-blue-500 text-[8px] md:text-[10px] font-fifa tracking-widest uppercase italic leading-none">CM (Remote)</p>
+                            <p class="text-[10px] md:text-xs text-white/30 italic leading-relaxed border-l border-white/10 pl-4">Promotion artistes. Contenus Canva & planification multi-plateformes.</p>
+                        </div>
+                        <div class="card-scouting p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] space-y-4 hover:bg-white/[0.05] transition-all">
+                            <span class="text-[8px] md:text-[9px] font-fifa bg-white/10 border border-white/10 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-white/40 uppercase italic tracking-widest leading-none">Mar - Sept 2022</span>
+                            <h6 class="text-xl md:text-3xl font-fifa text-white italic uppercase tracking-tighter leading-none uppercase">Shalommood</h6>
+                            <p class="text-blue-500 text-[8px] md:text-[10px] font-fifa tracking-widest uppercase italic leading-none">Asst Responsable Comm</p>
+                            <p class="text-[10px] md:text-xs text-white/30 italic leading-relaxed border-l border-white/10 pl-4">Campagnes de sortie musicale & coordination de promotion d'artistes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="stat-card reveal">
-          <div class="stat-value">5+</div>
-          <div class="stat-label">Structures</div>
-        </div>
-        <div class="stat-card reveal">
-          <div class="stat-value">75K+</div>
-          <div class="stat-label">Vues YouTube</div>
-        </div>
-        <div class="stat-card reveal">
-          <div class="stat-value">Digital</div>
-          <div class="stat-label">Spécialité</div>
-        </div>
-      </div>
     </div>
-  </section>
 
-  <!-- ===================== -->
-  <!-- ==== EXPERIENCE ===== -->
-  <!-- ===================== -->
-  <section>
-    <h2 class="reveal">Expériences</h2>
-    <div class="timeline">
-      <div class="timeline-item reveal">Sancofa Agency — Communication & branding</div>
-      <div class="timeline-item reveal">Pixl Studio — Création digitale</div>
-      <div class="timeline-item reveal">AMC Record — Univers musical</div>
-      <div class="timeline-item reveal">Shalommood Music — Label gospel urbain</div>
+    <!-- MODALE: CONTRACT FORM -->
+    <div id="contractModal" class="modal-overlay items-center justify-center p-2 md:p-4">
+        <div class="bg-[#0d0d0d] border border-white/10 w-full max-w-2xl rounded-[2rem] md:rounded-[4rem] p-8 md:p-16 shadow-2xl relative transition-all duration-500 scale-95" id="contractContent">
+            <button onclick="closeModal('contractModal')" class="absolute top-6 right-6 md:top-10 md:right-10 text-white/40 hover:text-white uppercase text-[8px] md:text-[10px] font-black tracking-widest leading-none">Cancel [X]</button>
+            <h3 class="text-2xl md:text-5xl font-fifa text-blue-500 mb-8 md:mb-12 text-center italic tracking-tighter uppercase leading-none">
+                <span data-lang="fr">Signature</span><span data-lang="en">Signing</span>
+            </h3>
+            <form id="contractForm" class="space-y-6 md:space-y-10" onsubmit="handleContract(event)">
+                <div class="grid grid-cols-1 gap-6 md:gap-8">
+                    <div class="space-y-3">
+                        <label class="text-[9px] md:text-[11px] font-fifa text-white/30 tracking-widest uppercase italic ml-2 leading-none">Organization</label>
+                        <input id="clubInput" required class="w-full bg-white/5 border border-white/10 rounded-xl md:rounded-[2rem] p-5 md:p-7 text-xs md:text-sm focus:outline-none focus:border-blue-500 transition-all text-white placeholder:text-white/10" placeholder="Sancofa, Pixl, etc.">
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[9px] md:text-[11px] font-fifa text-white/30 tracking-widest uppercase italic ml-2 leading-none">Message</label>
+                        <textarea id="msgInput" required rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl md:rounded-[2rem] p-5 md:p-7 text-xs md:text-sm focus:outline-none focus:border-blue-500 transition-all resize-none text-white placeholder:text-white/10" placeholder="Tactical brief..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 py-5 md:py-7 rounded-xl md:rounded-[2.5rem] font-fifa text-[10px] md:text-[13px] tracking-[0.3em] md:tracking-[0.4em] shadow-2xl active:scale-95 transition-all text-white uppercase italic leading-none">
+                    <span data-lang="fr">Transmettre au Board</span><span data-lang="en">Send to Board</span>
+                </button>
+            </form>
+            <div id="successBox" class="hidden absolute inset-0 bg-[#0d0d0d] flex flex-col items-center justify-center text-center p-8 md:p-12 z-20 rounded-[2rem] md:rounded-[4rem]">
+                <div class="w-16 h-16 md:w-28 md:h-28 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center text-3xl md:text-6xl mb-6 md:mb-10 shadow-[0_0_50px_rgba(34,197,94,0.3)] animate-pulse leading-none">✓</div>
+                <h4 class="text-2xl md:text-5xl font-fifa mb-4 text-white italic uppercase tracking-tighter leading-tight"><span data-lang="fr">Signature Confirmée</span><span data-lang="en">Signing Confirmed</span></h4>
+                <p class="text-white/30 italic text-sm md:text-lg leading-relaxed max-w-sm px-2">
+                    <span data-lang="fr">Votre offre a été transmise avec succès au board de Mohamed Sanogo.</span>
+                    <span data-lang="en">Your offer has been successfully submitted to Mohamed Sanogo's board.</span>
+                </p>
+                <button onclick="closeModal('contractModal')" class="mt-10 md:mt-14 font-fifa text-[9px] md:text-[11px] tracking-[0.3em] border-b-2 border-blue-500 pb-1 text-blue-500 hover:text-white transition-colors uppercase italic leading-none">Back to Dashboard</button>
+            </div>
+        </div>
     </div>
-  </section>
 
-  <!-- ===================== -->
-  <!-- ===== FOOTER ======= -->
-  <!-- ===================== -->
-  <footer>
-    © 2026 — Mohamed Sanogo • Creative Digital Profile
-  </footer>
+    <!-- SCRIPTS -->
+    <script>
+        let currentLang = 'fr';
 
-  <!-- ===================== -->
-  <!-- ======= SCRIPT ===== -->
-  <!-- ===================== -->
-  <script>
-    const reveals = document.querySelectorAll(".reveal");
+        function toggleLang() {
+            currentLang = currentLang === 'fr' ? 'en' : 'fr';
+            document.body.classList.toggle('lang-en', currentLang === 'en');
+            document.body.classList.toggle('lang-fr', currentLang === 'fr');
+            document.getElementById('langBtn').innerText = currentLang === 'en' ? 'FR' : 'EN';
+        }
 
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("active");
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            const content = id === 'scoutingModal' ? document.getElementById('scoutingContent') : document.getElementById('contractContent');
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            setTimeout(() => {
+                modal.classList.add('active');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+            
+            if(id === 'scoutingModal') {
+                setTimeout(() => {
+                    document.querySelectorAll('.stat-fill').forEach(el => {
+                        el.style.width = el.getAttribute('data-width');
+                    });
+                }, 400);
+            }
+        }
 
-    reveals.forEach(el => observer.observe(el));
-  </script>
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            const content = id === 'scoutingModal' ? document.getElementById('scoutingContent') : document.getElementById('contractContent');
+            
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            modal.classList.remove('active');
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                if(id === 'contractModal') {
+                    document.getElementById('successBox').classList.add('hidden');
+                    document.getElementById('contractForm').reset();
+                }
+                if(id === 'scoutingModal') {
+                    document.querySelectorAll('.stat-fill').forEach(el => el.style.width = '0');
+                }
+            }, 400);
+        }
 
+        function handleContract(e) {
+            e.preventDefault();
+            document.getElementById('successBox').classList.remove('hidden');
+            document.getElementById('successBox').classList.add('flex');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeModal('scoutingModal');
+                closeModal('contractModal');
+            }
+        }
+    </script>
 </body>
 </html>
