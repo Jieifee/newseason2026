@@ -1,0 +1,733 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Trophy, Target, Zap, Users, TrendingUp, Layout, 
+  ArrowLeft, Star, Award, Mail, Phone, 
+  ShieldCheck, Cpu, PenTool, Share2, ChevronRight,
+  BarChart3, Settings, Play, CheckCircle2, Globe, GraduationCap,
+  X, Send, Briefcase, FileText, MapPin, Calendar, Hash,
+  Music, Film, Sparkles, Flame
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// --- DICTIONNAIRE DE TRADUCTION ---
+
+const TRANSLATIONS = {
+  FR: {
+    nav: { dashboard: "Tableau de Bord", transfers: "Transferts", contact: "Contact" },
+    hero: {
+      academy: "Académie UCAO-UUA",
+      title_part1: "Espoir",
+      title_part2: "Montant.",
+      desc: "Étudiant en Master 2 spécialisé en communication d'organisation. Profil polyvalent entre stratégie digitale et design graphique.",
+      btn_contract: "Proposer un contrat",
+      btn_cv: "Consulter le CV"
+    },
+    card: {
+      potential: "Note Potentielle",
+      age_info: "22 ANS • M2 UCAO-UUA",
+      position_label: "Position",
+      position_value: "Créatif / Stratège"
+    },
+    sections: {
+      scouting: "Rapport de Scouting",
+      exp: "Expériences & Stages",
+      highlights: "Highlights de Session",
+      tactical: "Contribution Tactique",
+      mercato: "Mercato Ouvert",
+      mercato_subtitle: "Entrer en Négociation",
+      mercato_desc: "Actuellement en fin de cycle Master 2 à l'UCAO-UUA, je suis à la recherche de nouveaux challenges pour transformer mon potentiel en résultats concrets.",
+      btn_offer: "Envoyer une offre"
+    },
+    stats: { strategy: "Stratégie", design: "Design", social: "Social", tech: "IA Tech" },
+    footer: { formation: "Formation en cours : Master 2 UCAO-UUA", game_changer: "Futur Game Changer" },
+    contract: {
+      title: "Signature de Contrat",
+      club: "Nom de l'Organisation / Club",
+      role: "Poste Proposé",
+      duration: "Durée du Contrat",
+      budget: "Budget / Fourchette Salariale",
+      message: "Message Tactique",
+      submit: "Envoyer l'Offre",
+      success: "Offre envoyée avec succès !"
+    },
+    cv: {
+      title: "Rapport Technique Complet",
+      profile: "Profil du Joueur",
+      education: "Centre de Formation",
+      skills: "Attributs Techniques",
+      exp: "Historique des Matchs",
+      traits: "Traits Spéciaux",
+      interests: "Activités Hors-Terrain"
+    }
+  },
+  EN: {
+    nav: { dashboard: "Dashboard", transfers: "Transfers", contact: "Contact" },
+    hero: {
+      academy: "UCAO-UUA Academy",
+      title_part1: "Rising",
+      title_part2: "Prospect.",
+      desc: "Master 2 student specialized in organizational communication. Versatile profile balancing digital strategy and graphic design.",
+      btn_contract: "Offer a contract",
+      btn_cv: "View CV"
+    },
+    card: {
+      potential: "Potential Rating",
+      age_info: "22 YRS • M2 UCAO-UUA",
+      position_label: "Position",
+      position_value: "Creative / Strategist"
+    },
+    sections: {
+      scouting: "Scouting Report",
+      exp: "Experience & Internships",
+      highlights: "Session Highlights",
+      tactical: "Tactical Contribution",
+      mercato: "Open Window",
+      mercato_subtitle: "Start Negotiation",
+      mercato_desc: "Currently finishing Master 2 at UCAO-UUA, seeking new challenges to turn potential into concrete results.",
+      btn_offer: "Submit an offer"
+    },
+    stats: { strategy: "Strategy", design: "Design", social: "Social", tech: "AI Tech" },
+    footer: { formation: "Ongoing Training: Master 2 UCAO-UUA", game_changer: "Future Game Changer" },
+    contract: {
+      title: "Contract Signing",
+      club: "Organization / Club Name",
+      role: "Proposed Role",
+      duration: "Contract Duration",
+      budget: "Budget / Salary Range",
+      message: "Tactical Message",
+      submit: "Submit Offer",
+      success: "Offer submitted successfully!"
+    },
+    cv: {
+      title: "Full Technical Report",
+      profile: "Player Profile",
+      education: "Training Center",
+      skills: "Technical Attributes",
+      exp: "Match History",
+      traits: "Special Traits",
+      interests: "Off-pitch Activities"
+    }
+  }
+};
+
+// --- DATA ---
+
+const CLUBS = (lang) => [
+  {
+    id: 'pixlstudio',
+    name: 'Pixl Athletic',
+    period: '2025',
+    role: lang === 'FR' ? 'Community Manager (Stage)' : 'Community Manager (Intern)',
+    rating: 82,
+    highlights: lang === 'FR' ? [
+      'Gestion de l\'animation de 8 marques clientes.',
+      'Stratégie éditoriale et pilotage de campagnes.',
+      'Suivi analytique et reporting client.',
+      'Synergie avec l\'équipe créative.'
+    ] : [
+      'Management of 8 client brand portfolios.',
+      'Editorial strategy and campaign piloting.',
+      'Analytical tracking and client reporting.',
+      'Synergy with the creative team.'
+    ],
+    skills: ['Social Ads', 'Strategy', 'Reporting']
+  },
+  {
+    id: 'sancofa',
+    name: 'FC Sancofa',
+    period: '2024 - 2025',
+    role: lang === 'FR' ? 'Web & Graphic Designer' : 'Web & Graphic Designer',
+    rating: 84,
+    highlights: lang === 'FR' ? [
+      'Conception de sites vitrines et mockups UI.',
+      'Création d\'identités visuelles et logos.',
+      'Production intensive de contenus sociaux.',
+      'Développement Front-end (HTML/CSS).'
+    ] : [
+      'Design of showcase sites and UI mockups.',
+      'Brand identity and logo creation.',
+      'High-volume social content production.',
+      'Front-end development (HTML/CSS).'
+    ],
+    skills: ['UI Design', 'Branding', 'CMS']
+  },
+  {
+    id: 'amg',
+    name: 'AMG United',
+    period: '2025',
+    role: lang === 'FR' ? 'Community Manager (Remote)' : 'Community Manager (Remote)',
+    rating: 79,
+    highlights: lang === 'FR' ? [
+      'Promotion digitale d\'artistes musicaux.',
+      'Création visuelle via templates Canva.',
+      'Planification cross-canal des publications.'
+    ] : [
+      'Digital promotion for music artists.',
+      'Visual creation via Canva templates.',
+      'Cross-channel post scheduling.'
+    ],
+    skills: ['Canva', 'Music Label', 'Planning']
+  },
+  {
+    id: 'shalommood',
+    name: 'Shalommood City',
+    period: '2022',
+    role: lang === 'FR' ? 'Assistant Manager Comm' : 'Assistant Comm Manager',
+    rating: 75,
+    highlights: lang === 'FR' ? [
+      'Planification de campagnes de sortie musicale.',
+      'Coordination de la promotion artiste.',
+      'Rédaction de contenus promotionnels.'
+    ] : [
+      'Planning of music release campaigns.',
+      'Artist promotion coordination.',
+      'Promotional copywriting.'
+    ],
+    skills: ['Copywriting', 'Artist PR', 'Events']
+  }
+];
+
+// --- COMPONENTS ---
+
+const NumberBadge = ({ size = "md", color = "blue" }) => {
+  const sizeClasses = size === "sm" ? "w-10 h-10 text-xl" : "w-20 h-20 text-4xl";
+  const bgClasses = color === "blue" ? "bg-blue-600 shadow-[0_0_30px_rgba(37,99,235,0.4)]" : "bg-white text-blue-600";
+  
+  return (
+    <motion.div 
+      whileHover={{ scale: 1.1, rotate: 5 }}
+      className={`${sizeClasses} ${bgClasses} rounded-full flex items-center justify-center font-black italic border-2 border-white/20 select-none cursor-default`}
+    >
+      11
+    </motion.div>
+  );
+};
+
+const Modal = ({ isOpen, onClose, title, children }) => (
+  <AnimatePresence>
+    {isOpen && (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="absolute inset-0 bg-black/95 backdrop-blur-xl"
+        />
+        <motion.div 
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          className="relative w-full max-w-5xl bg-[#0d0d0d] border border-white/10 rounded-[3rem] overflow-hidden max-h-[90vh] flex flex-col shadow-2xl"
+        >
+          <div className="flex justify-between items-center p-8 border-b border-white/5">
+            <div className="flex items-center gap-4">
+               <div className="w-2 h-8 bg-blue-600 rounded-full" />
+               <h3 className="text-2xl font-black uppercase italic tracking-tighter text-white">{title}</h3>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/40 hover:text-white">
+              <X size={24} />
+            </button>
+          </div>
+          <div className="p-8 overflow-y-auto custom-scrollbar">
+            {children}
+          </div>
+        </motion.div>
+      </div>
+    )}
+  </AnimatePresence>
+);
+
+const FootballJersey = () => (
+  <div className="relative w-full h-full flex items-center justify-center p-2 group">
+    <svg viewBox="0 0 100 120" className="w-full h-full drop-shadow-[0_30px_60px_rgba(59,130,246,0.4)] transition-transform duration-500 group-hover:scale-105">
+      <defs>
+        <linearGradient id="jerseyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{ stopColor: '#2563eb', stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: '#1e3a8a', stopOpacity: 1 }} />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <path d="M20,30 L30,20 L70,20 L80,30 L80,110 L20,110 Z" fill="#000" opacity="0.3" transform="translate(3, 5)" />
+      <path d="M20,30 L30,20 L40,25 C45,22 55,22 60,25 L70,20 L80,30 L80,110 L20,110 Z" fill="url(#jerseyGrad)" />
+      
+      {/* Texture de maillot */}
+      <path d="M25,40 L75,40" stroke="white" strokeWidth="0.5" opacity="0.1" />
+      <path d="M25,60 L75,60" stroke="white" strokeWidth="0.5" opacity="0.1" />
+      <path d="M25,80 L75,80" stroke="white" strokeWidth="0.5" opacity="0.1" />
+      
+      <text x="50" y="45" textAnchor="middle" fill="white" fontSize="7" fontWeight="900" style={{ textTransform: 'uppercase', letterSpacing: '1.2px' }} filter="url(#glow)">SANOGO</text>
+      <text x="50" y="88" textAnchor="middle" fill="white" fontSize="34" fontWeight="900" fontFamily="serif" filter="url(#glow)">11</text>
+      
+      <path d="M30,20 L40,25 C45,22 55,22 60,25 L70,20" fill="none" stroke="white" strokeWidth="1" opacity="0.2" />
+    </svg>
+  </div>
+);
+
+// --- MAIN APP ---
+
+export default function App() {
+  const [lang, setLang] = useState('FR');
+  const [activeClub, setActiveClub] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isContractOpen, setIsContractOpen] = useState(false);
+  const [isCvOpen, setIsCvOpen] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const t = TRANSLATIONS[lang];
+  const clubs = CLUBS(lang);
+
+  const CORE_STATS = [
+    { label: t.stats.strategy, value: 81, icon: Target },
+    { label: t.stats.design, value: 85, icon: PenTool },
+    { label: t.stats.social, value: 88, icon: Share2 },
+    { label: t.stats.tech, value: 76, icon: Cpu },
+  ];
+
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 1500);
+  }, []);
+
+  const handleContractSubmit = (e) => {
+    e.preventDefault();
+    setIsSuccess(true);
+    setTimeout(() => {
+      setIsSuccess(false);
+      setIsContractOpen(false);
+    }, 2500);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+        <motion.div 
+          animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }} 
+          transition={{ duration: 1.5, repeat: Infinity }} 
+          className="flex flex-col items-center gap-6"
+        >
+          <NumberBadge size="md" />
+          <div className="text-blue-500 font-black italic text-2xl tracking-widest uppercase">
+            {lang === 'FR' ? 'Analyse Tactique...' : 'Tactical Analysis...'}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-blue-500/30 overflow-x-hidden">
+      
+      {/* HEADER */}
+      <header className="fixed top-0 w-full z-50 bg-[#0a0a0a]/90 backdrop-blur-md border-b border-white/5 px-6 md:px-12 py-6">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <NumberBadge size="sm" />
+            <div className="leading-none ml-2">
+              <span className="font-black uppercase tracking-tighter text-sm block">M. Sanogo (22 ans)</span>
+              <span className="text-[8px] text-blue-500 font-bold uppercase tracking-widest leading-none">Master 2 Communication • UCAO-UUA</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-8">
+            <div className="hidden md:flex gap-8 text-[10px] font-black uppercase tracking-widest text-white/40">
+              <span className="text-blue-500 cursor-default">{t.nav.dashboard}</span>
+              <button className="hover:text-white cursor-pointer transition-colors uppercase tracking-[0.2em]" onClick={() => setIsCvOpen(true)}>{t.nav.transfers}</button>
+            </div>
+            <button 
+              onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')} 
+              className="px-4 py-1.5 bg-white/5 border border-white/10 rounded-lg text-[10px] font-black text-white/60 hover:text-blue-500 hover:border-blue-500 transition-all"
+            >
+              {lang}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="pt-40 pb-24 px-6 md:px-12 max-w-6xl mx-auto space-y-40">
+        
+        {/* HERO SECTION */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-7 space-y-12">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+              <div className="flex items-center gap-3 text-blue-500 font-black text-[11px] uppercase tracking-[0.5em]">
+                <div className="w-8 h-[1px] bg-blue-500" /> {t.hero.academy}
+              </div>
+              <h1 className="text-7xl md:text-[9rem] font-black uppercase italic tracking-tighter leading-[0.8]">
+                {t.hero.title_part1} <br />
+                <span className="text-blue-500 drop-shadow-[0_10px_30px_rgba(59,130,246,0.3)]">{t.hero.title_part2}</span>
+              </h1>
+              <p className="text-xl text-white/40 max-w-lg font-medium leading-relaxed italic border-l-2 border-blue-600/30 pl-8">"{t.hero.desc}"</p>
+            </motion.div>
+
+            <div className="flex flex-wrap gap-6 pt-4">
+              <button 
+                onClick={() => setIsContractOpen(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-5 rounded-full font-black uppercase tracking-widest text-[11px] transition-all transform hover:scale-105 shadow-[0_20px_40px_rgba(37,99,235,0.3)]"
+              >
+                {t.hero.btn_contract}
+              </button>
+              <button 
+                onClick={() => setIsCvOpen(true)}
+                className="bg-white/5 border border-white/10 hover:bg-white/10 text-white px-12 py-5 rounded-full font-black uppercase tracking-widest text-[11px] transition-all"
+              >
+                {t.hero.btn_cv}
+              </button>
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <motion.div 
+              initial={{ opacity: 0, rotate: 5, scale: 0.9 }} 
+              animate={{ opacity: 1, rotate: 0, scale: 1 }} 
+              whileHover={{ scale: 1.02, rotate: -1 }}
+              className="relative w-full max-w-[360px] aspect-[3/4] bg-gradient-to-br from-white/10 to-transparent border border-white/10 p-10 rounded-[3.5rem] shadow-2xl backdrop-blur-xl group"
+            >
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity"><Star size={180} className="text-white fill-current" /></div>
+              <div className="flex justify-between items-start mb-12 relative z-10">
+                <div className="leading-none">
+                  <span className="text-8xl font-black italic text-white drop-shadow-2xl">79</span>
+                  <p className="text-blue-500 font-bold text-xs uppercase mt-3 tracking-widest">{t.card.potential}</p>
+                </div>
+                <NumberBadge />
+              </div>
+              <h2 className="text-5xl font-black uppercase italic tracking-tighter mb-2 relative z-10 text-white">SANOGO</h2>
+              <p className="text-[11px] font-black uppercase text-white/40 mb-12 tracking-[0.3em] relative z-10">{t.card.age_info}</p>
+              
+              <div className="space-y-5 relative z-10">
+                {CORE_STATS.map(stat => (
+                  <div key={stat.label} className="space-y-1.5">
+                    <div className="flex justify-between items-end text-[10px] font-black uppercase tracking-widest">
+                      <span className="text-white/30">{stat.label}</span>
+                      <span className="text-white italic">{stat.value}</span>
+                    </div>
+                    <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                       <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${stat.value}%` }}
+                        transition={{ duration: 1, delay: 0.5 }}
+                        className="h-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.5)]" 
+                       />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-10 pt-8 border-t border-white/10 flex justify-between items-center relative z-10">
+                 <span className="text-[10px] font-black uppercase text-white/20 tracking-widest">{t.card.position_label}</span>
+                 <span className="text-[12px] font-black uppercase text-blue-500 italic tracking-tight">{t.card.position_value}</span>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* JERSEY SECTION (MAILLOT AU CENTRE) */}
+        <section className="flex flex-col items-center justify-center py-20 relative">
+            <div className="absolute inset-0 bg-blue-600/[0.03] blur-[200px] rounded-full" />
+            <motion.div 
+                initial={{ opacity: 0, y: 50 }} 
+                whileInView={{ opacity: 1, y: 0 }} 
+                viewport={{ once: true }} 
+                className="w-80 h-96 md:w-[450px] md:h-[500px] relative cursor-default"
+            >
+                <FootballJersey />
+                <div className="mt-12 text-center space-y-3">
+                    <div className="inline-flex items-center gap-3">
+                       <div className="h-[1px] w-8 bg-blue-500/40" />
+                       <span className="text-xs font-black text-blue-500 uppercase tracking-[0.8em] italic block">Game Changer</span>
+                       <div className="h-[1px] w-8 bg-blue-500/40" />
+                    </div>
+                    <h4 className="text-5xl font-black text-white italic uppercase tracking-tighter">Squad Number #11</h4>
+                </div>
+            </motion.div>
+        </section>
+
+        {/* TRANSFERS LIST */}
+        <section>
+          <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-10">
+            <div className="space-y-4">
+              <h3 className="text-6xl font-black uppercase italic tracking-tighter leading-none">{t.sections.exp}</h3>
+              <p className="text-blue-500 text-sm font-bold uppercase tracking-[0.6em]">{t.sections.scouting}</p>
+            </div>
+            <TrendingUp className="w-16 h-16 text-white/5 hidden md:block" />
+          </div>
+          <div className="grid grid-cols-1 gap-8">
+            {clubs.map((club) => (
+              <motion.div 
+                key={club.id} 
+                whileHover={{ x: 10 }}
+                className="group bg-white/[0.01] border border-white/5 p-10 rounded-[2.5rem] hover:bg-white/[0.04] transition-all relative overflow-hidden"
+              >
+                <div className="flex flex-col md:flex-row items-center gap-10 relative z-10">
+                  <div className="w-20 h-20 bg-blue-600/10 border border-blue-500/20 rounded-3xl flex items-center justify-center text-3xl font-black italic text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-xl">
+                    {club.name[0]}
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <span className="text-[11px] font-black text-blue-500/60 uppercase tracking-[0.5em]">{club.period}</span>
+                    <h4 className="text-3xl font-black uppercase italic tracking-tighter mt-2">{club.name}</h4>
+                    <p className="text-sm font-bold text-white/30 uppercase tracking-[0.2em] mt-1 italic">{club.role}</p>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {club.skills.map(skill => (
+                      <span key={skill} className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] text-white/50 group-hover:border-blue-500/30 group-hover:text-blue-400 transition-all">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                  <button onClick={() => setActiveClub(activeClub === club.id ? null : club.id)} className="p-4 bg-white/5 rounded-full hover:bg-blue-600 transition-colors shadow-lg">
+                    <ChevronRight className={`w-6 h-6 transition-transform ${activeClub === club.id ? 'rotate-90' : ''}`} />
+                  </button>
+                </div>
+                <AnimatePresence>
+                  {activeClub === club.id && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-10 pt-10 border-t border-white/10">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                        <div className="space-y-8">
+                          <h5 className="text-[12px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-4 italic">
+                            <CheckCircle2 size={18}/> {t.sections.highlights}
+                          </h5>
+                          <ul className="space-y-4">
+                            {club.highlights.map((h, i) => (
+                              <li key={i} className="text-base text-white/50 leading-relaxed italic flex gap-6">
+                                <span className="text-blue-500 font-black shrink-0 text-lg">»</span> {h}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="flex flex-col justify-center items-center p-10 bg-black/40 rounded-[3rem] border border-white/5 shadow-inner group">
+                           <TrendingUp className="w-12 h-12 text-blue-500/30 mb-6 group-hover:scale-110 transition-transform" />
+                           <p className="text-[11px] font-black uppercase tracking-[0.4em] text-white/20 mb-3">{t.sections.tactical}</p>
+                           <span className="text-7xl font-black italic text-white">{club.rating / 10}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* MERCATO SECTION */}
+        <section className="bg-gradient-to-br from-white/[0.04] to-transparent border border-white/5 rounded-[5rem] p-20 md:p-32 text-center relative overflow-hidden">
+          <div className="absolute bottom-0 right-0 p-16 opacity-5 pointer-events-none"><Target size={300} /></div>
+          <div className="absolute top-0 left-0 p-16 opacity-5 pointer-events-none"><ShieldCheck size={250} /></div>
+          <h3 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter leading-none">{t.sections.mercato_subtitle}</h3>
+          <p className="text-blue-500 text-sm font-black uppercase tracking-[0.6em] mt-6 mb-12">{t.sections.mercato}</p>
+          <p className="text-2xl text-white/40 mb-16 max-w-2xl mx-auto italic font-medium leading-relaxed">"{t.sections.mercato_desc}"</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto relative z-10">
+            <button 
+              onClick={() => setIsContractOpen(true)} 
+              className="flex items-center justify-between bg-white text-black px-10 py-7 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-blue-600 hover:text-white transition-all shadow-2xl transform hover:scale-105"
+            >
+              <span className="flex items-center gap-5"><Mail size={22} /> {t.sections.btn_offer}</span>
+              <ChevronRight size={22} />
+            </button>
+            <div className="flex items-center justify-between bg-white/5 border border-white/10 px-10 py-7 rounded-[2rem] font-black uppercase tracking-widest text-xs group hover:bg-white/10 transition-all cursor-default">
+              <span className="flex items-center gap-5 text-white/60"><Phone size={22} /> +225 0161492067</span>
+              <Globe size={22} className="opacity-20 group-hover:opacity-100 group-hover:rotate-45 transition-all" />
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      {/* MODAL: CONTRACT FORM */}
+      <Modal isOpen={isContractOpen} onClose={() => setIsContractOpen(false)} title={t.contract.title}>
+        <form onSubmit={handleContractSubmit} className="space-y-10 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-4">
+              <label className="text-[12px] font-black uppercase text-white/30 tracking-[0.2em]">{t.contract.club}</label>
+              <input required type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-base font-medium focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-all text-white placeholder:text-white/10" placeholder="Ex: Sancofa Agency" />
+            </div>
+            <div className="space-y-4">
+              <label className="text-[12px] font-black uppercase text-white/30 tracking-[0.2em]">{t.contract.role}</label>
+              <input required type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-base font-medium focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-all text-white placeholder:text-white/10" placeholder="Ex: Creative Lead" />
+            </div>
+            <div className="space-y-4">
+              <label className="text-[12px] font-black uppercase text-white/30 tracking-[0.2em]">{t.contract.duration}</label>
+              <input required type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-base font-medium focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-all text-white placeholder:text-white/10" placeholder="Ex: CDI / Full-time" />
+            </div>
+            <div className="space-y-4">
+              <label className="text-[12px] font-black uppercase text-white/30 tracking-[0.2em]">{t.contract.budget}</label>
+              <input required type="text" className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-base font-medium focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-all text-white placeholder:text-white/10" placeholder="Ex: À discuter" />
+            </div>
+          </div>
+          <div className="space-y-4">
+            <label className="text-[12px] font-black uppercase text-white/30 tracking-[0.2em]">{t.contract.message}</label>
+            <textarea required rows="5" className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 text-base font-medium focus:outline-none focus:border-blue-500 focus:bg-white/10 transition-all resize-none text-white placeholder:text-white/10" placeholder="Détaillez vos objectifs tactiques pour cette collaboration..."></textarea>
+          </div>
+          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 py-7 rounded-3xl font-black uppercase tracking-[0.4em] text-xs flex items-center justify-center gap-6 transition-all shadow-2xl shadow-blue-600/30 active:scale-95">
+            {isSuccess ? <><CheckCircle2 size={24} /> {t.contract.success}</> : <><Send size={24} /> {t.contract.submit}</>}
+          </button>
+        </form>
+      </Modal>
+
+      {/* MODAL: CV (FULL SCOUTING REPORT) */}
+      <Modal isOpen={isCvOpen} onClose={() => setIsCvOpen(false)} title={t.cv.title}>
+        <div className="space-y-20 py-10">
+          {/* Top Identity */}
+          <div className="flex flex-col md:flex-row gap-16 items-center md:items-start pb-16 border-b border-white/5">
+            <div className="relative group">
+               <div className="absolute inset-0 bg-blue-600/20 blur-3xl group-hover:bg-blue-600/40 transition-colors" />
+               <NumberBadge />
+            </div>
+            <div className="space-y-8 text-center md:text-left flex-1">
+              <div className="space-y-3">
+                <h4 className="text-6xl font-black italic uppercase tracking-tighter leading-none">Mohamed Sanogo</h4>
+                <div className="flex flex-wrap justify-center md:justify-start gap-4">
+                   <span className="px-4 py-2 bg-blue-600/10 border border-blue-500/20 text-blue-500 rounded-lg text-[10px] font-black uppercase tracking-widest italic tracking-[0.2em]">Master 2 Communication</span>
+                   <span className="px-4 py-2 bg-white/5 rounded-lg text-[10px] font-black uppercase italic tracking-[0.2em]">22 Years Old • Abidjan</span>
+                </div>
+              </div>
+              <p className="text-white/50 text-xl leading-relaxed max-w-3xl italic border-l-4 border-blue-600 pl-10">"{t.hero.desc}"</p>
+              <div className="flex flex-wrap justify-center md:justify-start gap-10 text-[12px] font-black uppercase tracking-[0.3em] text-white/20">
+                <span className="flex items-center gap-4 group cursor-pointer hover:text-white transition-colors"><MapPin size={18} className="text-blue-500"/> Marcory, Abidjan</span>
+                <span className="flex items-center gap-4 group cursor-pointer hover:text-white transition-colors"><Mail size={18} className="text-blue-500"/> sanogochristian74@gmail.com</span>
+                <span className="flex items-center gap-4 group cursor-pointer hover:text-white transition-colors"><Phone size={18} className="text-blue-500"/> +225 0161492067</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Education & Traits */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+            <div className="space-y-12">
+              <h5 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-6 text-blue-500">
+                <GraduationCap size={32} /> {t.cv.education}
+              </h5>
+              <div className="space-y-12">
+                <div className="relative pl-10 border-l-2 border-white/10">
+                   <div className="absolute top-0 left-[-7px] w-3 h-3 bg-blue-600 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.8)]" />
+                   <div className="space-y-2">
+                      <p className="text-[11px] font-black text-blue-500 uppercase tracking-[0.3em]">2024 - Présent</p>
+                      <p className="font-black uppercase text-2xl italic leading-none tracking-tight">Master en Communication</p>
+                      <p className="text-sm text-white/30 uppercase font-black tracking-widest">UCAO-UUA / ISCOM</p>
+                   </div>
+                </div>
+                <div className="relative pl-10 border-l-2 border-white/10">
+                   <div className="absolute top-0 left-[-7px] w-3 h-3 bg-white/20 rounded-full" />
+                   <div className="space-y-2">
+                      <p className="text-[11px] font-black text-white/30 uppercase tracking-[0.3em]">2021 - 2024</p>
+                      <p className="font-black uppercase text-2xl italic leading-none tracking-tight">Licence Communication d'Org</p>
+                      <p className="text-sm text-white/30 uppercase font-black tracking-widest">UCAO-UUA / ISCOM</p>
+                   </div>
+                </div>
+                <div className="relative pl-10 border-l-2 border-white/10">
+                   <div className="absolute top-0 left-[-7px] w-3 h-3 bg-white/10 rounded-full" />
+                   <div className="space-y-2">
+                      <p className="text-[11px] font-black text-white/30 uppercase tracking-[0.3em]">2019 - 2021</p>
+                      <p className="font-black uppercase text-2xl italic leading-none tracking-tight">Baccalauréat A2</p>
+                      <p className="text-sm text-white/30 uppercase font-black tracking-widest">Collège Adventiste d'Abidjan</p>
+                   </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-12">
+              <h5 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-6 text-blue-500">
+                <Flame size={32} /> {t.cv.traits}
+              </h5>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  { n: "Architecte UI+", d: "Précision chirurgicale dans la structure des interfaces.", i: Layout },
+                  { n: "Data Maestro", d: "Analyse des metrics pour optimiser chaque tactique.", i: BarChart3 },
+                  { n: "AI Enhanced", d: "Utilisation poussée de l'IA pour booster la création.", i: Cpu },
+                  { n: "Playmaker Social", d: "Vision de jeu étendue sur les réseaux sociaux.", i: Share2 }
+                ].map(trait => (
+                  <div key={trait.n} className="bg-white/5 p-6 rounded-[2rem] border border-white/5 group hover:bg-white/10 transition-all">
+                    <trait.i className="w-8 h-8 text-blue-500 mb-4 group-hover:scale-110 transition-transform" />
+                    <p className="font-black uppercase text-sm italic mb-1 text-white">{trait.n}</p>
+                    <p className="text-[10px] text-white/40 uppercase font-bold leading-tight">{trait.d}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Technical Stats */}
+          <div className="space-y-12">
+            <h5 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-6 text-blue-500">
+              <Zap size={32} /> {t.cv.skills}
+            </h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                { n: "Stratégie Comm", v: 90 }, { n: "Social Media", v: 92 }, 
+                { n: "Design Graphique", v: 88 }, { n: "Meta Business", v: 85 }, 
+                { n: "Google Analytics", v: 80 }, { n: "Outils IA", v: 85 }, 
+                { n: "Web Design", v: 82 }, { n: "Montage Vidéo", v: 78 }, 
+                { n: "Rédaction Web", v: 85 }
+              ].map(s => (
+                <div key={s.n} className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-[11px] font-black uppercase tracking-widest text-white/50">{s.n}</span>
+                    <span className="text-lg font-black text-blue-500 italic">{s.v}</span>
+                  </div>
+                  <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${s.v}%` }}
+                      transition={{ duration: 1.5 }}
+                      className="h-full bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]" 
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Off-field Interests */}
+          <div className="space-y-12">
+             <h5 className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-6 text-blue-500">
+                <Star size={32} /> {t.cv.interests}
+             </h5>
+             <div className="flex flex-wrap gap-8">
+                <div className="flex items-center gap-5 bg-white/5 px-8 py-5 rounded-[2rem] border border-white/5">
+                   <Music className="w-8 h-8 text-pink-500" />
+                   <div>
+                      <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Hobby 01</p>
+                      <p className="text-xl font-black uppercase italic tracking-tight">Musique</p>
+                   </div>
+                </div>
+                <div className="flex items-center gap-5 bg-white/5 px-8 py-5 rounded-[2rem] border border-white/5">
+                   <Film className="w-8 h-8 text-orange-500" />
+                   <div>
+                      <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Hobby 02</p>
+                      <p className="text-xl font-black uppercase italic tracking-tight">Cinéma</p>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* FOOTER HUD */}
+      <footer className="border-t border-white/5 bg-[#0a0a0a] py-20 px-6 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10 opacity-30 text-center md:text-left">
+          <div className="flex items-center gap-5">
+             <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(37,99,235,1)]" />
+             <span className="text-[10px] font-black uppercase tracking-[0.5em] italic">{t.footer.formation}</span>
+          </div>
+          <div className="text-center group">
+            <p className="text-[11px] font-black uppercase tracking-[0.8em] mb-2 italic text-white group-hover:text-blue-500 transition-colors">SANOGO #11</p>
+            <p className="text-[10px] font-black uppercase tracking-widest">© 2026 • {t.footer.game_changer}</p>
+          </div>
+          <div className="flex gap-10 items-center">
+            <Share2 size={20} className="hover:text-blue-500 cursor-pointer transition-all hover:scale-110" />
+            <Award size={20} className="hover:text-blue-500 cursor-pointer transition-all hover:scale-110" />
+            <Sparkles size={20} className="hover:text-blue-500 cursor-pointer transition-all hover:scale-110" />
+          </div>
+        </div>
+      </footer>
+
+      {/* AMBIENT BACKGROUND */}
+      <div className="fixed inset-0 -z-10 pointer-events-none opacity-[0.03]">
+        <div className="w-full h-full bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:80px_80px]" />
+      </div>
+
+    </div>
+  );
+}
